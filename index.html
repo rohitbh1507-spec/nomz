@@ -229,6 +229,14 @@ nav.tabs .fab svg{width:28px;height:28px}
 .toast button{border:0;background:color-mix(in srgb,var(--bg) 18%,transparent);color:var(--bg);font-weight:800;border-radius:999px;padding:5px 12px}
 .toast.solo{padding-right:16px}
 @keyframes tin{from{transform:translate(-50%,20px);opacity:0}}
+.quote{position:relative;border-radius:20px;padding:16px 16px 14px 48px;background:linear-gradient(135deg,color-mix(in srgb,var(--fast) 16%,var(--surface)),color-mix(in srgb,var(--brand-2) 14%,var(--surface)));box-shadow:var(--shadow);animation:qin .6s ease-out}
+.quote .qm{position:absolute;left:14px;top:4px;font-family:var(--display);font-size:52px;font-weight:800;line-height:1;background:linear-gradient(140deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.quote p{margin:0;font-family:var(--display);font-weight:600;font-size:17px;line-height:1.3;text-wrap:balance}
+.quote small{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:700}
+@keyframes qin{from{opacity:.3;transform:translateY(6px)}}
+.guess{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;background:var(--surface);border-radius:12px;padding:9px 12px}
+.guess .gb{flex:1;height:6px;border-radius:3px;background:var(--surface-2);align-self:center;overflow:hidden;max-width:90px}
+.guess .gb i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:370px){.hero-in{grid-template-columns:1fr;justify-items:center}.hstats{width:100%}}
@@ -248,7 +256,7 @@ nav.tabs .fab svg{width:28px;height:28px}
   <button role="tab" data-act="tab" data-tab="fast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M10 2h4"/></svg>Fasting</button>
   <button role="tab" data-act="tab" data-tab="coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01" stroke-linecap="round" stroke-width="3"/></svg>Coach</button>
 </div></nav>
-<input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+<input type="file" id="photoIn" accept="image/*" capture="environment" hidden><input type="file" id="photoLocal" accept="image/*" capture="environment" hidden>
 <div id="sheetRoot"></div><div id="toastRoot"></div><canvas id="confetti"></canvas>
 
 <script>
@@ -277,6 +285,8 @@ const FOODS=[
 ].map((f,i)=>({id:"f"+i,name:f[0],serving:f[1],kcal:f[2],p:f[3],c:f[4],f:f[5],em:f[6]}));
 const MEALS=[["Breakfast","🌅","#FFE8CC"],["Lunch","☀️","#FFF3C4"],["Snacks","🍿","#FFDDEB"],["Dinner","🌙","#DDE3FF"]];
 const KEY="thali-tracker-v2";
+const QUOTES=["Progress over perfection. One roti at a time.","Main character energy starts with breakfast.","Small steps still count as steps. Literally.","Your future self is watching. Give them a glow up.","Hydrate like it's your full-time job.","Consistency is the cheat code.","You don't need a new year. You need a new hour.","Rest is part of the plan, not a skip.","Eat the dal. Be the legend.","Discipline is just self-love with a schedule.","Not every day is a 10/10. Logging it still counts.","Slow progress is still a W.","Fuel the body, not just the cravings.","One good meal won't fix everything. One bad one won't ruin it either.","You've survived every hard day so far. Undefeated.","Glow up loading. Keep going.","Protein first, plot twist later.","Walk it off. Then walk some more.","Do it for the streak.","Be so consistent they think it's easy.","Talk to yourself like you would to your bestie.","Comparison steals joy. Stay in your lane.","Today's choices are tomorrow's flex.","Sleep, water, veggies. The holy trinity."];
+function quoteNow(){const h=Math.floor(Date.now()/3600e3);return{q:QUOTES[h%QUOTES.length],h,mins:60-new Date().getMinutes()}}
 const PLANS=[[13,"Gentle"],[16,"Popular"],[18,"Advanced"],[20,"Warrior"]];
 
 const iso=d=>{const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
@@ -366,6 +376,7 @@ function viewHome(){
    <div class="daynav"><button class="iconbtn" data-act="day" data-n="-1" aria-label="Previous day">‹</button>
    <button class="iconbtn" data-act="day" data-n="1" aria-label="Next day" ${cur>=TODAY?"disabled style='opacity:.35'":""}>›</button></div></div>`;
   if(S.sample)h+=`<div class="banner"><span>Example week loaded so you can see the vibe.</span><button data-act="clearSample">Start fresh</button></div>`;
+  if(cur===TODAY){const Q=quoteNow();h+=`<section class="quote" aria-label="Quote of the hour"><span class="qm">“</span><p>${esc(Q.q)}</p><small>New vibe in ${Q.mins} min</small></section>`}
   h+=`<section class="hero"><div class="hero-in"><div class="ring">${ringSVG(64,13,"rgba(255,255,255,.25)",anim.pct,"#fff")}
      <div class="mid"><div class="big num" id="kleft" data-to="${r0(Math.abs(left))}">${r0(Math.abs(left))}</div><div class="sub">kcal ${left<0?"over":"left"}</div></div></div>
      <div class="hstats"><div class="hs"><span class="ic">🎯</span><div><small>Budget</small><b class="num">${t.kcal}</b></div></div>
@@ -489,7 +500,7 @@ function sheetHTML(){
     const q=(s.q||"").trim().toLowerCase(),src=s.list==="recent"?S.recents.map(findFood).filter(Boolean):s.list==="mine"?S.custom:allFoods();
     const list=src.filter(f=>!q||f.name.toLowerCase().includes(q)).slice(0,60);
     return`${head("Add to "+s.meal.toLowerCase())}${mealChips}
-    <div class="qa" style="${window.claude?"":"grid-template-columns:repeat(2,1fr)"}">${window.claude?`<button data-act="ai" data-mode="photo"><span class="qi" style="background:linear-gradient(135deg,#FF5A1F,#F72585)">📸</span>Snap meal</button>
+    <div class="qa" style="${window.claude?"":"grid-template-columns:repeat(3,1fr)"}">${window.claude?"":`<button data-act="snapLocal"><span class="qi" style="background:linear-gradient(135deg,#FF5A1F,#F72585)">📸</span>Snap food</button>`}${window.claude?`<button data-act="ai" data-mode="photo"><span class="qi" style="background:linear-gradient(135deg,#FF5A1F,#F72585)">📸</span>Snap meal</button>
      <button data-act="ai" data-mode="text"><span class="qi" style="background:linear-gradient(135deg,#7C5CFF,#3D7BFF)">✍️</span>Describe</button>`:""}
      <button data-act="quick"><span class="qi" style="background:linear-gradient(135deg,#12B76A,#06B6D4)">⚡</span>Quick add</button>
      <button data-act="create"><span class="qi" style="background:linear-gradient(135deg,#FFB020,#FF5A1F)">➕</span>New food</button></div>
@@ -517,6 +528,19 @@ function sheetHTML(){
     <div class="field"><label for="cf_s">Serving size</label><input id="cf_s" placeholder="e.g. 1 piece" value="1 serving"></div>
     <div class="grid2"><div class="field"><label for="cf_k">Calories</label><input id="cf_k" inputmode="numeric" required></div><div class="field"><label for="cf_p">Protein g</label><input id="cf_p" inputmode="decimal"></div><div class="field"><label for="cf_c">Carbs g</label><input id="cf_c" inputmode="decimal"></div><div class="field"><label for="cf_f">Fat g</label><input id="cf_f" inputmode="decimal"></div></div>
     <div class="note">Saved to My foods so you can reuse it any day.</div><button class="btn">Save food</button></form>`;
+  if(s.kind==="snap"){
+    let body=`${s.photo?`<img class="photo" src="${s.photo}" alt="Your food">`:""}`;
+    if(s.busy)body+=`<div class="note" style="display:flex;gap:10px;align-items:center"><span class="spinner"></span>${s.busy}</div>`;
+    else if(s.err)body+=`<div class="note" style="color:var(--bad)">${esc(s.err)}</div>`;
+    else if(s.guesses){
+      body+=`<div class="label">What your phone sees</div>${s.guesses.map(g=>`<div class="guess"><span>${esc(g.label)}</span><span class="gb"><i style="width:${r0(g.p*100)}%"></i></span><span class="num">${r0(g.p*100)}%</span></div>`).join("")}`;
+      body+=s.matches.length?`<div class="label">Is it one of these? Tap to log</div><div class="foods">${s.matches.map(f=>{const g=grade(f);return`<button class="food" data-act="pick" data-id="${f.id}"><span class="n"><span style="font-size:22px">${f.em||"🍽️"}</span><span><div>${esc(f.name)}</div><small><span class="dot ${g[0]}" style="display:inline-block;margin-right:4px"></span>${esc(f.serving)}</small></span></span><span class="k num">${f.kcal}<span class="plus">+</span></span></button>`}).join("")}</div>`
+        :`<div class="note">Couldn't match this to a food in the list.</div>`;
+      body+=`<div class="grid2"><button class="btn ghost" data-act="snapSearch">Search instead</button><button class="btn ghost" data-act="quick">Quick add</button></div>`;
+    }
+    body+=`<button class="btn" data-act="snapLocal">📸 ${s.photo?"Try another photo":"Take a photo"}</button>`;
+    return`${head("Snap food",true)}${body}<div class="muted" style="font-size:12px">Recognition runs on your phone and works best on one food per photo.</div>`;
+  }
   if(s.kind==="ai"){
     let body="";
     if(AI===null)body=`<div class="note">AI logging runs on Claude. Open this app inside Claude while signed in, or use search and Quick add.</div>`;
@@ -576,7 +600,32 @@ async function downscale(file){
   c.getContext("2d").drawImage(img,0,0,c.width,c.height);
   const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));return{blob,url:c.toDataURL("image/jpeg",.7)};
 }
-let photoBlob=null;
+let photoBlob=null,MODEL=null;
+const loadScript=src=>new Promise((res,rej)=>{const el=document.createElement("script");el.src=src;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
+const LABELMAP=[[/banana/,"Banana"],[/granny smith|apple/,"Apple"],[/mango|orange|lemon|pineapple|fig|pomegranate|jackfruit|custard apple|strawberry/,"Mango","Papaya"],
+ [/espresso|coffee|cup|mug|teapot/,"Masala chai","Filter coffee"],[/soup|consomme|hot ?pot|potpie|mixing bowl/,"Dal tadka","Sambar","Khichdi","Rajma"],
+ [/cauliflower|mashed potato/,"Aloo gobi"],[/broccoli|cucumber|bell pepper|zucchini|head cabbage|artichoke/,"Mixed veg curry","Sprouts salad","Bhindi sabzi"],
+ [/plate|tray|wok|frying pan/,"Veg biryani","Chicken biryani","Chole","Paneer butter masala"],[/burrito|taco|bagel|pretzel|french loaf|dough|pizza/,"Roti / chapati","Aloo paratha","Plain paratha"],
+ [/cheeseburger|hamburger|hotdog/,"Vada pav","Pav bhaji"],[/ice cream|trifle|chocolate/,"Gulab jamun","Jalebi"],[/egg/,"Boiled egg","Masala omelette"],
+ [/carbonara|spaghetti|noodle/,"Instant noodles"],[/milk|eggnog/,"Milk (toned)","Curd (dahi)"],[/meat ?loaf|drumstick/,"Tandoori chicken","Chicken curry"],
+ [/corn|popcorn/,"Bhel puri","Roasted chana"],[/guacamole/,"Coconut chutney"],[/rice|pilaf/,"Steamed rice","Jeera rice"]];
+async function snapAnalyse(url){
+  const s=sheet;
+  try{
+    s.busy="Loading food scanner (first time takes a few seconds)…";renderSheet();
+    if(!window.tf)await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");
+    if(!window.mobilenet)await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js");
+    if(!MODEL)MODEL=await mobilenet.load({version:2,alpha:1.0});
+    if(sheet!==s)return;s.busy="Looking at your food…";renderSheet();
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const preds=await MODEL.classify(img,5);
+    const guesses=preds.map(x=>({label:x.className.split(",")[0],full:x.className.toLowerCase(),p:x.probability}));
+    const names=[];guesses.forEach(g=>{LABELMAP.forEach(([re,...fs])=>{if(re.test(g.full))fs.forEach(n=>{if(!names.includes(n))names.push(n)})});
+      allFoods().forEach(f=>{const w=f.name.toLowerCase().split(/[\s/()]+/).filter(x=>x.length>3);if(w.some(x=>g.full.includes(x))&&!names.includes(f.name))names.push(f.name)})});
+    s.guesses=guesses.slice(0,3);s.matches=names.map(n=>allFoods().find(f=>f.name===n)).filter(Boolean).slice(0,6);s.busy=null;
+  }catch(e){s.busy=null;s.err="Couldn't run the scanner. Check your internet and try again, or search instead."}
+  if(sheet===s)renderSheet();
+}
 async function runAI(){
   const s=sheet;
   const ask=`You estimate nutrition for a calorie-tracking app used in India. ${s.mode==="photo"?"Identify every food item visible in the attached photo of a meal.":"The user described their meal as: \""+(s.text||"")+"\"."}${s.hint?" Extra detail from the user: "+s.hint+".":""}
@@ -636,6 +685,8 @@ document.addEventListener("click",async e=>{
   case"quick":sheet={kind:"quick",meal:s.meal,prev:s};renderSheet();break;
   case"create":sheet={kind:"create",meal:s.meal,prev:s};renderSheet();break;
   case"ai":sheet={kind:"ai",mode:b.dataset.mode,meal:s.meal,prev:s.kind==="ai"?s.prev:s};photoBlob=null;renderSheet();if(b.dataset.mode==="photo"&&AIimg)$("photoIn").click();break;
+  case"snapLocal":if(s.kind!=="snap")sheet={kind:"snap",meal:s.meal,prev:s};$("photoLocal").click();break;
+  case"snapSearch":sheet={kind:"add",meal:s.meal,list:"all"};renderSheet();$("q")?.focus();break;
   case"pickPhoto":$("photoIn").click();break;
   case"aiEx":s.text=b.dataset.t;renderSheet(true);break;
   case"aiRun":if(s.mode==="text"){s.text=$("aiText").value.trim();if(!s.text){s.err="Write what you ate first.";renderSheet(true);break}}else s.hint=$("aiHint")?.value.trim();runAI();break;
@@ -661,6 +712,10 @@ document.addEventListener("click",async e=>{
 });
 document.addEventListener("change",async e=>{
   if(e.target.dataset.act==="aiTick"){sheet.items[+e.target.dataset.i].on=e.target.checked;renderSheet(true)}
+  if(e.target.id==="photoLocal"&&e.target.files[0]&&sheet?.kind==="snap"){
+    try{const{url}=await downscale(e.target.files[0]);sheet.photo=url;sheet.err=null;sheet.guesses=null;renderSheet();snapAnalyse(url)}catch(err){sheet.err="Couldn't open that image. Try another photo.";renderSheet()}
+    e.target.value="";
+  }
   if(e.target.id==="photoIn"&&e.target.files[0]&&sheet?.kind==="ai"){
     try{const{blob,url}=await downscale(e.target.files[0]);photoBlob=blob;sheet.photo=url;sheet.err=null}catch(err){sheet.err="Couldn't open that image. Try another photo."}
     e.target.value="";renderSheet();
@@ -684,6 +739,8 @@ document.addEventListener("submit",e=>{
 setInterval(()=>{if(tab!=="fast")return;const fi=fastInfo();if(!fi)return;$("fclock").textContent=hms(fi.el);$("fleft").textContent=fi.done?"Break your fast when ready":hms(fi.goal-fi.el)+" to go";
   const a=document.querySelector(".farc");if(a)a.setAttribute("stroke-dasharray",`${a.dataset.c*fi.pct} ${a.dataset.c}`)},1000);
 
+let lastQ=quoteNow().h;setInterval(()=>{const Q=quoteNow();if(Q.h!==lastQ&&tab==="home"&&!sheet){lastQ=Q.h;render()}},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&quoteNow().h!==lastQ&&tab==="home"&&!sheet){lastQ=quoteNow().h;render()}});
 if(!window.claude){const c=document.querySelector('[data-tab="coach"]');c.hidden=true;document.querySelector("nav.tabs .in").style.gridTemplateColumns="repeat(4,1fr)"}
 render();
 
